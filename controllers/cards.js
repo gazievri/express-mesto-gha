@@ -57,7 +57,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Card ID is incorrect' });
+      res.status(400).send({ message: 'Card ID is incorrect' });
     } else {
       res.status(500).send({ message: 'Error has occured' });
     }
