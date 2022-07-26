@@ -11,7 +11,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner })
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.status(201).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -25,11 +25,18 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCardById = (req, res) => {
   const { cardId } = req.params;
+
   Card.findByIdAndRemove(cardId)
-    .then((cards) => res.send({ data: cards }))
+    .then((card) => {
+      if (!card) {
+        res.status(400).send({ message: `Card with id ${cardId} not found` });
+        return;
+      }
+      res.send({ data: card });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: `Card with id ${req.params.id} not found` });
+        res.status(404).send({ message: `Card with id ${cardId} not found` });
       } else {
         res.status(500).send({ message: 'Error has occured' });
       }

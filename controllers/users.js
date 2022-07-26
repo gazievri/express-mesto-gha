@@ -9,7 +9,13 @@ module.exports.getAllUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(400).send({ message: 'The requested user not found' });
+        return;
+      };
+      res.send({ data: user });
+    })
     .catch((err) => {
       const ERROR_CODE = 400;
       if (err.name === 'CastError') {
