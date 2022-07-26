@@ -29,14 +29,14 @@ module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(400).send({ message: `Card with id ${cardId} not found` });
+        res.status(404).send({ message: 'Card not found' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: `Card with id ${cardId} not found` });
+        res.status(400).send({ message: `Card id ${cardId} is not correct` });
       } else {
         res.status(500).send({ message: 'Error has occured' });
       }
@@ -48,7 +48,13 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
   { new: true },
 )
-  .then((card) => res.send({ data: card }))
+  .then((card) => {
+    if (!card) {
+      res.status(404).send({ message: 'Request card not found' });
+      return;
+    }
+    res.send({ data: card });
+  })
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Incorrect data was sent to set/unlike' });
@@ -64,7 +70,13 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { $pull: { likes: req.user._id } }, // убрать _id из массива
   { new: true },
 )
-  .then((card) => res.send({ data: card }))
+  .then((card) => {
+    if (!card) {
+      res.status(404).send({ message: 'Request card not found' });
+      return;
+    }
+    res.send({ data: card });
+  })
   .catch((err) => {
     if (err.name === 'CastError') {
       res.status(404).send({ message: `A non-existent id ${req.params.cardId} of the card was passed` });

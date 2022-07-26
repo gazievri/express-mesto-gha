@@ -11,7 +11,7 @@ module.exports.getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(400).send({ message: 'The requested user not found' });
+        res.status(404).send({ message: 'The requested user not found' });
         return;
       };
       res.send({ data: user });
@@ -21,7 +21,9 @@ module.exports.getUserById = (req, res) => {
       if (err.name === 'CastError') {
         res
           .status(ERROR_CODE)
-          .send({ message: 'The requested user not found' });
+          .send({ message: 'Id is incorrect' });
+      } else {
+        res.status(500).send({ message: 'Error is occured' });
       }
     });
 };
@@ -29,7 +31,7 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       const ERROR_CODE = 400;
       if (err.name === 'ValidationError') {
@@ -53,7 +55,13 @@ module.exports.updateUser = (req, res) => {
       runValidators: true, // данные будут валидированы перед изменением
     }
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(400).send({ message: 'User ID is incorrect' });
+        return;
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -61,12 +69,12 @@ module.exports.updateUser = (req, res) => {
           .send({ message: 'Invalid data passed when updating profile' });
       } else if (err.name === 'CastError') {
         res
-          .status(404)
+          .status(400)
           .send({
-            message: `The user with the specified id ${userId} was not found`,
+            message: 'User ID is incorrect',
           });
       } else {
-        res.status(500).send({ message: 'Error has occured', err });
+        res.status(500).send({ message: 'Error has occured' });
       }
     });
 };
@@ -82,7 +90,13 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `User with id ${userId} not found` });
+        return;
+      };
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
@@ -90,12 +104,12 @@ module.exports.updateAvatar = (req, res) => {
           .send({ message: 'Invalid data passed when updating profile' });
       } else if (err.name === 'CastError') {
         res
-          .status(404)
+          .status(400)
           .send({
-            message: `The user with the specified id ${userId} was not found`,
+            message: 'User ID is incorrect',
           });
       } else {
-        res.status(500).send({ message: 'Error has occured', err });
+        res.status(500).send({ message: 'Error has occured' });
       }
     });
 };
