@@ -44,6 +44,8 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Incorrect data was sent to set/unlike' });
+    } else if (err.name === 'CastError') {
+      res.status(404).send({ message: `A non-existent id ${req.params.cardId} of the card was passed` });
     } else {
       res.status(500).send({ message: 'Error has occured' });
     }
