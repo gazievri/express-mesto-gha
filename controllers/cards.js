@@ -56,10 +56,8 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     res.send({ data: card });
   })
   .catch((err) => {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Incorrect data was sent to set/unlike' });
-    } else if (err.name === 'CastError') {
-      res.status(404).send({ message: `A non-existent id ${req.params.cardId} of the card was passed` });
+    if (err.name === 'CastError') {
+      res.status(404).send({ message: 'Card ID is incorrect' });
     } else {
       res.status(500).send({ message: 'Error has occured' });
     }
@@ -79,7 +77,7 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: `A non-existent id ${req.params.cardId} of the card was passed` });
+      res.status(400).send({ message: 'Card ID is incorrect' });
     } else {
       res.status(500).send({ message: 'Error has occured' });
     }
