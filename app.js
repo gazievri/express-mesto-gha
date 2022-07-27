@@ -9,6 +9,9 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(bodyParser.json());
+// app.use(express.json()) - парсинг запросов встроенными методом express без подключения bodyParser
+
+
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -26,10 +29,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// app.use((req, res, next) => {
+//   console.log(`${req.method}: ${req.path}`);
+//   next();
+// });
+
 app.use(router);
 app.use(routerCards);
+app.all('/*', (req, res) => {
+  res.status(404).send({ message: 'Requested path not found' });
+});
 
 app.listen(PORT, () => {
-  // Если всё работает, консоль покажет, какой порт приложение слушает
   console.log(`App listening on port ${PORT}`);
 });
