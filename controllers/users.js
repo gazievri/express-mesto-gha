@@ -1,9 +1,13 @@
 const User = require('../models/user');
 
+const {
+  STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
+} = require('../utils/constants');
+
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Error has occured' }));
+    .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' }));
 };
 
 module.exports.getUserById = (req, res) => {
@@ -11,19 +15,18 @@ module.exports.getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'The requested user not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'The requested user not found' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
-      const ERROR_CODE = 400;
       if (err.name === 'CastError') {
         res
-          .status(ERROR_CODE)
+          .status(STATUS_BAD_REQUEST)
           .send({ message: 'Id is incorrect' });
       } else {
-        res.status(500).send({ message: 'Error is occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error is occured' });
       }
     });
 };
@@ -31,15 +34,14 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(STATUS_CREATED).send({ data: user }))
     .catch((err) => {
-      const ERROR_CODE = 400;
       if (err.name === 'ValidationError') {
         res
-          .status(ERROR_CODE)
+          .status(STATUS_BAD_REQUEST)
           .send({ message: 'Inccorrect data passed during user creation' });
       } else {
-        res.status(500).send({ message: 'Error has occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
 };
@@ -57,7 +59,7 @@ module.exports.updateUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `User ID ${userId} is not found` });
+        res.status(STATUS_NOT_FOUND).send({ message: `User ID ${userId} is not found` });
         return;
       }
       res.send({ data: user });
@@ -65,16 +67,16 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(STATUS_BAD_REQUEST)
           .send({ message: 'Invalid data passed when updating profile' });
       } else if (err.name === 'CastError') {
         res
-          .status(400)
+          .status(STATUS_BAD_REQUEST)
           .send({
             message: 'User ID is incorrect',
           });
       } else {
-        res.status(500).send({ message: 'Error has occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
 };
@@ -92,7 +94,7 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `User with id ${userId} not found` });
+        res.status(STATUS_NOT_FOUND).send({ message: `User with id ${userId} not found` });
         return;
       }
       res.send({ data: user });
@@ -100,16 +102,16 @@ module.exports.updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(STATUS_BAD_REQUEST)
           .send({ message: 'Invalid data passed when updating profile' });
       } else if (err.name === 'CastError') {
         res
-          .status(400)
+          .status(STATUS_BAD_REQUEST)
           .send({
             message: 'User ID is incorrect',
           });
       } else {
-        res.status(500).send({ message: 'Error has occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
 };

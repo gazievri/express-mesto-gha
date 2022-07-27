@@ -1,9 +1,12 @@
 const Card = require('../models/card');
+const {
+  STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
+} = require('../utils/constants');
 
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Error has occured' }));
+    .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -11,14 +14,14 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner })
-    .then((cards) => res.status(201).send({ data: cards }))
+    .then((cards) => res.status(STATUS_CREATED).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
-          .status(400)
+          .status(STATUS_BAD_REQUEST)
           .send({ message: 'Inccorrect data passed during user creation' });
       } else {
-        res.status(500).send({ message: 'Error has occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
 };
@@ -29,16 +32,16 @@ module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `Card id ${cardId} is not correct` });
+        res.status(STATUS_BAD_REQUEST).send({ message: `Card id ${cardId} is not correct` });
       } else {
-        res.status(500).send({ message: 'Error has occured' });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
 };
@@ -50,16 +53,16 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (!card) {
-      res.status(404).send({ message: 'Request card not found' });
+      res.status(STATUS_NOT_FOUND).send({ message: 'Request card not found' });
       return;
     }
     res.send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Card ID is incorrect' });
+      res.status(STATUS_BAD_REQUEST).send({ message: 'Card ID is incorrect' });
     } else {
-      res.status(500).send({ message: 'Error has occured' });
+      res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
     }
   });
 
@@ -70,15 +73,15 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (!card) {
-      res.status(404).send({ message: 'Request card not found' });
+      res.status(STATUS_NOT_FOUND).send({ message: 'Request card not found' });
       return;
     }
     res.send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Card ID is incorrect' });
+      res.status(STATUS_BAD_REQUEST).send({ message: 'Card ID is incorrect' });
     } else {
-      res.status(500).send({ message: 'Error has occured' });
+      res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
     }
   });
