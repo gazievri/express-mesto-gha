@@ -3,7 +3,7 @@ const Card = require('../models/card');
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: 'Error has occured' }));
+    .catch(() => res.status(500).send({ message: 'Error has occured' }));
 };
 
 module.exports.createCard = (req, res) => {

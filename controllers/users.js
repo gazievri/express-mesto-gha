@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: 'Error has occured' }));
+    .catch(() => res.status(500).send({ message: 'Error has occured' }));
 };
 
 module.exports.getUserById = (req, res) => {
@@ -13,7 +13,7 @@ module.exports.getUserById = (req, res) => {
       if (!user) {
         res.status(404).send({ message: 'The requested user not found' });
         return;
-      };
+      }
       res.send({ data: user });
     })
     .catch((err) => {
@@ -53,11 +53,11 @@ module.exports.updateUser = (req, res) => {
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-    }
+    },
   )
     .then((user) => {
       if (!user) {
-        res.status(400).send({ message: 'User ID is incorrect' });
+        res.status(404).send({ message: `User ID ${userId} is not found` });
         return;
       }
       res.send({ data: user });
@@ -94,7 +94,7 @@ module.exports.updateAvatar = (req, res) => {
       if (!user) {
         res.status(404).send({ message: `User with id ${userId} not found` });
         return;
-      };
+      }
       res.send({ data: user });
     })
     .catch((err) => {
