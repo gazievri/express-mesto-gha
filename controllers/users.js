@@ -33,17 +33,29 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   const emailIsValid = validator.isEmail(email);
 
-  User.create({ name, about, avatar, email, password })
-    .then((user) => res.status(STATUS_CREATED).send({ data: user }))
+  User.create({
+    name, about, avatar, email, password,
+  })
+    .then((user) => {
+      if (!emailIsValid) {
+        res.status(STATUS_BAD_REQUEST).send({ message: `User email ${email} is not real email` });
+        return;
+      }
+      res.status(STATUS_CREATED).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res
           .status(STATUS_BAD_REQUEST)
           .send({ message: 'Inccorrect data passed during user creation' });
+      } else if (err.name === 'MongoServerError') {
+        res.status(STATUS_BAD_REQUEST).send({ message: `User with email ${email} already exist` });
       } else {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
