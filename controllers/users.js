@@ -1,4 +1,5 @@
 const validator = require('validator');
+const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const User = require('../models/user');
 
 const {
@@ -39,9 +40,10 @@ module.exports.createUser = (req, res) => {
 
   const emailIsValid = validator.isEmail(email);
 
-  User.create({
-    name, about, avatar, email, password,
-  })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => {
       if (!emailIsValid) {
         res.status(STATUS_BAD_REQUEST).send({ message: `User email ${email} is not real email` });
