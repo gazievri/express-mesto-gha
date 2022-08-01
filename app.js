@@ -1,4 +1,6 @@
+require('dotenv').config();
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const router = require('./routes/users');
@@ -9,6 +11,8 @@ const { STATUS_NOT_FOUND } = require('./utils/constants');
 const { PORT = 3000 } = process.env;
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use(bodyParser.json());
 // app.use(express.json()) - парсинг запросов встроенными методом express без подключения bodyParser

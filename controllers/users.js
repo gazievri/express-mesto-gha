@@ -1,9 +1,17 @@
 const validator = require('validator');
-const bcrypt = require('bcryptjs'); // импортируем bcrypt
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const {
-  STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
+  STATUS_CREATED,
+  STATUS_NOT_FOUND,
+  STATUS_BAD_REQUEST,
+  STATUS_INTERNAL_SERVER_ERROR,
+  STATUS_UNAUTHORIZED_ERROR,
+  STATUS_OK,
 } = require('../utils/constants');
 
 module.exports.getAllUsers = (req, res) => {
@@ -131,5 +139,20 @@ module.exports.updateAvatar = (req, res) => {
       } else {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.status(STATUS_OK).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
+    })
+    .catch((err) => {
+      res
+        .status(STATUS_UNAUTHORIZED_ERROR)
+        .send({ message: err.message });
     });
 };
