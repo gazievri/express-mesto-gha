@@ -21,7 +21,7 @@ module.exports.getAllUsers = (req, res, next) => {
       if (!user) {
         throw new InternalServerError('Error has occured');
       }
-      res.send({ data: user });
+      res.status(STATUS_OK).send({ data: user });
     })
     .catch(next);
 };
@@ -33,7 +33,7 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('The requested user not found');
       }
-      res.send({ data: user });
+      res.status(STATUS_OK).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -89,7 +89,7 @@ module.exports.updateUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(`User ID ${userId} is not found`);
       }
-      res.send({ data: user });
+      res.status(STATUS_OK).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -118,7 +118,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(`User with id ${userId} not found`);
       }
-      res.send({ data: user });
+      res.status(STATUS_OK).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

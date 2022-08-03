@@ -6,11 +6,12 @@ const ForbiddenError = require('../errors/forbidden-errors');
 
 const {
   STATUS_CREATED,
+  STATUS_OK,
 } = require('../utils/constants');
 
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.status(STATUS_OK).send({ data: cards }))
     .catch(() => {
       throw new InternalServerError('Error has occured');
     })
@@ -43,7 +44,7 @@ module.exports.deleteCardById = (req, res, next) => {
       if (req.user._id !== card.owner) {
         throw new ForbiddenError('You can not delete not yours cards');
       }
-      res.send({ data: card });
+      res.status(STATUS_OK).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -64,7 +65,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
     if (!card) {
       throw new NotFoundError('Request card not found');
     }
-    res.send({ data: card });
+    res.status(STATUS_OK).send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
@@ -84,7 +85,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
     if (!card) {
       throw new NotFoundError('Request card not found');
     }
-    res.send({ data: card });
+    res.status(STATUS_OK).send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
