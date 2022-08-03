@@ -36,7 +36,10 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findByIdAndRemove(cardId, {
+    new: true,
+    runValidators: true,
+  })
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Card not found');
