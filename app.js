@@ -3,8 +3,9 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const router = require('./routes/users');
+const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
+const auth = require('./middlewares/auth');
 
 const { STATUS_NOT_FOUND } = require('./utils/constants');
 
@@ -20,26 +21,11 @@ app.use(bodyParser.json());
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-  // useUnifiedTopology: true,
-  // useCreateIndex: true,
-  // useFindAndModify: false,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62decd338fe6a082a601ac3b',
-  };
-
-  next();
-});
-
-// app.use((req, res, next) => {
-//   console.log(`${req.method}: ${req.path}`);
-//   next();
-// });
-
-app.use(router);
+app.use(routerUsers);
 app.use(routerCards);
+
 app.all('/*', (req, res) => {
   res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
 });

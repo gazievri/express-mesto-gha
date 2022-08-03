@@ -5,10 +5,10 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const { STATUS_UNAUTHORIZED_ERROR } = require('../utils/constants');
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
+  const { authorization } = req.cookies;
 
-  if (!authorization || !authorization.startsWIth('Bearer ')) {
-    return res.status(STATUS_UNAUTHORIZED_ERROR).send({ message: 'Authorization is needed' });
+  if (!authorization) {
+    return res.status(STATUS_UNAUTHORIZED_ERROR).send({ message: 'Authorization is needed 777' });
   }
 
   const token = authorization.replace('Bearer ', '');

@@ -28,11 +28,14 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCardById = (req, res) => {
   const { cardId } = req.params;
-
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         res.status(STATUS_NOT_FOUND).send({ message: 'Card not found' });
+        return;
+      }
+      if (req.user._id !== card.owner) {
+        res.status(STATUS_BAD_REQUEST).send({ message: 'You can not delete not yours cards' });
         return;
       }
       res.send({ data: card });
