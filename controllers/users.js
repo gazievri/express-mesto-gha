@@ -2,46 +2,50 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const InternalServerError = require('../errors/internal-server-errors');
+const BadRequestError = require('../errors/bad-request-errors');
+const EmailExistError = require('../errors/email-exist-errors');
+const NotFoundError = require('../errors/not-found-errors');
+const UnauthorizedError = require('../errors/unauthorized-errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const {
   STATUS_CREATED,
-  STATUS_NOT_FOUND,
-  STATUS_BAD_REQUEST,
-  STATUS_INTERNAL_SERVER_ERROR,
-  STATUS_UNAUTHORIZED_ERROR,
   STATUS_OK,
 } = require('../utils/constants');
 
-module.exports.getAllUsers = (req, res) => {
+module.exports.getAllUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' }));
+    .then((user) => {
+      if (!user) {
+        throw new InternalServerError('Error has occured');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: 'The requested user not found' });
-        return;
+        throw new NotFoundError('The requested user not found');
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Id is incorrect' });
+        throw new BadRequestError('Id is incorrect');
       } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error is occured' });
+        throw new InternalServerError('Error has occured');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -54,25 +58,23 @@ module.exports.createUser = (req, res) => {
     }))
     .then((user) => {
       if (!emailIsValid) {
-        res.status(STATUS_BAD_REQUEST).send({ message: `User email ${email} is not real email` });
-        return;
+        throw new BadRequestError(`User email ${email} is not real email`);
       }
       res.status(STATUS_CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Inccorrect data passed during user creation' });
-      } else if (err.name === 'MongoServerError') {
-        res.status(STATUS_BAD_REQUEST).send({ message: `User with email ${email} already exist` });
+        throw new BadRequestError('Inccorrect data passed during user creation');
+      } else if (err.code === 11000) {
+        throw new EmailExistError(`User with email ${email} already exist`);
       } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
+        throw new InternalServerError('Error has occured');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   User.findByIdAndUpdate(
@@ -85,29 +87,23 @@ module.exports.updateUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: `User ID ${userId} is not found` });
-        return;
+        throw new NotFoundError(`User ID ${userId} is not found`);
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Invalid data passed when updating profile' });
+        throw new BadRequestError('Invalid data passed when updating profile');
       } else if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({
-            message: 'User ID is incorrect',
-          });
+        throw new BadRequestError('User ID is incorrect');
       } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
+        throw new InternalServerError('Error has occured');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -120,29 +116,23 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: `User with id ${userId} not found` });
-        return;
+        throw new NotFoundError(`User with id ${userId} not found`);
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Invalid data passed when updating profile' });
+        throw new BadRequestError('Invalid data passed when updating profile');
       } else if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({
-            message: 'User ID is incorrect',
-          });
+        throw new BadRequestError('User ID is incorrect');
       } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
+        throw new InternalServerError('Error has occured');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -151,10 +141,9 @@ module.exports.login = (req, res) => {
       res.status(STATUS_OK).cookie('authorization', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
     .catch((err) => {
-      res
-        .status(STATUS_UNAUTHORIZED_ERROR)
-        .send({ message: err.message });
-    });
+      throw new UnauthorizedError(err.message);
+    })
+    .catch(next);
 };
 
 module.exports.getUserInfo = (req, res) => {
@@ -162,5 +151,7 @@ module.exports.getUserInfo = (req, res) => {
 
   User.find({ _id })
     .then((user) => res.status(STATUS_OK).send({ user }))
-    .catch(() => res.status(STATUS_UNAUTHORIZED_ERROR).send({ message: 'Authorization is needed' }));
+    .catch(() => {
+      throw new UnauthorizedError('Authorization is needed');
+    });
 };

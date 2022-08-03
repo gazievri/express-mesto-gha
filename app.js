@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
-const auth = require('./middlewares/auth');
 
 const { STATUS_NOT_FOUND } = require('./utils/constants');
 
@@ -28,6 +27,17 @@ app.use(routerCards);
 
 app.all('/*', (req, res) => {
   res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'Error has occured'
+        : message
+    });
 });
 
 app.listen(PORT, () => {
