@@ -71,10 +71,9 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Inccorrect data passed during user creation');
-      } else if (err.code === 11000) {
+      }
+      if (err.code === 11000) {
         throw new EmailExistError(`User with email ${email} already exist`);
-      } else {
-        throw new InternalServerError('Error has occured');
       }
     })
     .catch(next);
