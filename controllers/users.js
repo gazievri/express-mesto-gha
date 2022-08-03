@@ -53,9 +53,15 @@ module.exports.createUser = (req, res, next) => {
   const emailIsValid = validator.isEmail(email);
 
   bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
+    .then((hash) => User.create(
+      {
+        name, about, avatar, email, password: hash,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    ))
     .then((user) => {
       if (!emailIsValid) {
         throw new BadRequestError(`User email ${email} is not real email`);
