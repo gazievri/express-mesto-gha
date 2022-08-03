@@ -10,12 +10,16 @@ routerCards.get('/cards', auth, getAllCards);
 
 routerCards.post('/cards', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    link: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), auth, createCard);
 
-routerCards.delete('/cards/:cardId', auth, deleteCardById);
+routerCards.delete('/cards/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), auth, deleteCardById);
 
 routerCards.put('/cards/:cardId/likes', auth, likeCard);
 
