@@ -21,8 +21,16 @@ routerCards.delete('/cards/:cardId', celebrate({
   }),
 }), auth, deleteCardById);
 
-routerCards.put('/cards/:cardId/likes', auth, likeCard);
+routerCards.put('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), auth, likeCard);
 
-routerCards.delete('/cards/:cardId/likes', auth, dislikeCard);
+routerCards.delete('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), auth, dislikeCard);
 
 module.exports = routerCards;
