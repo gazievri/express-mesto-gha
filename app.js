@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
@@ -28,6 +29,8 @@ app.use(routerCards);
 app.all('/*', (req, res) => {
   res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
 });
+
+app.use(errors());
 
 app.use((err, req, res) => {
   const { statusCode = 500, message } = err;
