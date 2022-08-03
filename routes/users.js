@@ -25,21 +25,21 @@ routerUsers.patch('/users/me', celebrate({
 
 routerUsers.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    link: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    link: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), auth, updateAvatar);
 
 routerUsers.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-    password: Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
   }),
 }), login);
 
 routerUsers.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-    password: Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
   }),
 }), createUser);
 
