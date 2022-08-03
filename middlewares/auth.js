@@ -4,6 +4,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 const { STATUS_UNAUTHORIZED_ERROR } = require('../utils/constants');
 
+// eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
   const { authorization } = req.cookies;
 

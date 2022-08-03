@@ -29,14 +29,14 @@ app.all('/*', (req, res) => {
   res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
     .send({
       message: statusCode === 500
         ? 'Error has occured'
-        : message
+        : message,
     });
 });
 

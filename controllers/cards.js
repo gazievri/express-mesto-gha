@@ -1,12 +1,10 @@
 const Card = require('../models/card');
 const InternalServerError = require('../errors/internal-server-errors');
 const BadRequestError = require('../errors/bad-request-errors');
-const EmailExistError = require('../errors/email-exist-errors');
 const NotFoundError = require('../errors/not-found-errors');
-const UnauthorizedError = require('../errors/unauthorized-errors');
 
 const {
-  STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
+  STATUS_CREATED,
 } = require('../utils/constants');
 
 module.exports.getAllCards = (req, res, next) => {
@@ -93,4 +91,5 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
     } else {
       throw new InternalServerError('Error has occured');
     }
-  });
+  })
+  .catch(next);
