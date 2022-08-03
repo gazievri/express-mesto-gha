@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const InternalServerError = require('../errors/internal-server-errors');
 const BadRequestError = require('../errors/bad-request-errors');
 const NotFoundError = require('../errors/not-found-errors');
+const ForbiddenError = require('../errors/forbidden-errors');
 
 const {
   STATUS_CREATED,
@@ -40,7 +41,7 @@ module.exports.deleteCardById = (req, res, next) => {
         throw new NotFoundError('Card not found');
       }
       if (req.user._id !== card.owner) {
-        throw new BadRequestError('You can not delete not yours cards');
+        throw new ForbiddenError('You can not delete not yours cards');
       }
       res.send({ data: card });
     })
