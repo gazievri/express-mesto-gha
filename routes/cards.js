@@ -8,12 +8,12 @@ const {
 
 routerCards.get('/cards', auth, getAllCards);
 
-routerCards.post('/cards', auth, celebrate({
+routerCards.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     link: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
-}), createCard);
+}), auth, createCard);
 
 routerCards.delete('/cards/:cardId', auth, deleteCardById);
 
