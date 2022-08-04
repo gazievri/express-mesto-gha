@@ -6,6 +6,7 @@ const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
+const NotFoundError = require('./errors/not-found-errors');
 
 const { STATUS_NOT_FOUND } = require('./utils/constants');
 
@@ -16,7 +17,6 @@ const app = express();
 app.use(cookieParser());
 
 app.use(bodyParser.json());
-// app.use(express.json()) - парсинг запросов встроенными методом express без подключения bodyParser
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -27,12 +27,13 @@ app.use(routerUsers);
 app.use(routerCards);
 
 app.all('/*', (req, res) => {
+  throw new
   res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
 });
 
 app.use(errors());
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

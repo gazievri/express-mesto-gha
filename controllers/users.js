@@ -1,4 +1,3 @@
-const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -14,14 +13,12 @@ const {
   STATUS_CREATED,
   STATUS_OK,
 } = require('../utils/constants');
+const { errors } = require('celebrate');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
-      if (!user) {
-        throw new InternalServerError('Error has occured');
-      }
-      res.status(STATUS_OK).send({ data: user });
+      res.send({ data: user });
     })
     .catch(next);
 };
@@ -50,31 +47,23 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  const emailIsValid = validator.isEmail(email);
-
   bcrypt.hash(password, 10)
     .then((hash) => User.create(
       {
         name, about, avatar, email, password: hash,
       },
-      {
-        new: true,
-        runValidators: true,
-      },
     ))
     .then((user) => {
-      if (!emailIsValid) {
-        throw new BadRequestError(`User email ${email} is not real email`);
-      }
       res.status(STATUS_CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Inccorrect data passed during user creation');
+        throw new BadRequestError(err.message);
       }
       if (err.code === 11000) {
         throw new EmailExistError(`User with email ${email} already exist`);
       }
+      throw err;
     })
     .catch(next);
 };
@@ -151,12 +140,13 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUserInfo = (req, res) => {
+module.exports.getUserInfo = (req, res, next) => {
   const { _id } = req.user;
 
   User.find({ _id })
     .then((user) => res.status(STATUS_OK).send({ user }))
     .catch(() => {
       throw new UnauthorizedError('Authorization is needed');
-    });
+    })
+    .catch(next);
 };
