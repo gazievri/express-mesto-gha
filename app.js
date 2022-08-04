@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const NotFoundError = require('./errors/not-found-errors');
+const { handleError } = require('./utils/handleError');
 
 const { STATUS_NOT_FOUND } = require('./utils/constants');
 
@@ -26,23 +27,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(routerUsers);
 app.use(routerCards);
 
-app.all('/*', (req, res) => {
-  throw new
-  res.status(STATUS_NOT_FOUND).send({ message: 'Requested path not found' });
+app.all('/*', (req, res, next) => {
+  throw new NotFoundError('Requested path not found');
 });
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'Error has occured'
-        : message,
-    });
-});
+app.use(handleError);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

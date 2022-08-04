@@ -13,7 +13,6 @@ const {
   STATUS_CREATED,
   STATUS_OK,
 } = require('../utils/constants');
-const { errors } = require('celebrate');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
@@ -135,7 +134,7 @@ module.exports.login = (req, res, next) => {
       res.status(STATUS_OK).cookie('authorization', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
     .catch((err) => {
-      throw new UnauthorizedError(err.message);
+      throw err;
     })
     .catch(next);
 };
@@ -145,8 +144,8 @@ module.exports.getUserInfo = (req, res, next) => {
 
   User.find({ _id })
     .then((user) => res.status(STATUS_OK).send({ user }))
-    .catch(() => {
-      throw new UnauthorizedError('Authorization is needed');
+    .catch((err) => {
+      throw err;
     })
     .catch(next);
 };
