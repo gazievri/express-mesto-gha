@@ -5,7 +5,6 @@ const InternalServerError = require('../errors/internal-server-errors');
 const BadRequestError = require('../errors/bad-request-errors');
 const EmailExistError = require('../errors/email-exist-errors');
 const NotFoundError = require('../errors/not-found-errors');
-const UnauthorizedError = require('../errors/unauthorized-errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 

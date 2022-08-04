@@ -36,25 +36,18 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId, {
-    new: true,
-    runValidators: true,
-  })
+
+  Card.findById(cardId)
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Card not found');
-      }
-      if (req.user._id !== card.owner) {
-        throw new ForbiddenError('You can not delete not yours cards');
-      }
-      res.status(STATUS_OK).send({ data: card });
+      // eslint-disable-next-line eqeqeq
+      if (card.owner != req.user._id) { throw new ForbiddenError('You can not delete not yours cards'); }
+      if (!card) { throw new NotFoundError('Card not found'); }
+      card.remove()
+        .then(() => res.status(STATUS_OK).send({ message: `Card ${cardId} has been removed` }))
+        .catch((err) => { throw err; });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequestError(`Card id ${cardId} is not correct`);
-      } else {
-        throw new InternalServerError('Error has occured');
-      }
+      throw err;
     })
     .catch(next);
 };
