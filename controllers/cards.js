@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-const InternalServerError = require('../errors/internal-server-errors');
 const BadRequestError = require('../errors/bad-request-errors');
 const NotFoundError = require('../errors/not-found-errors');
 const ForbiddenError = require('../errors/forbidden-errors');
@@ -12,8 +11,8 @@ const {
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(STATUS_OK).send({ data: cards }))
-    .catch(() => {
-      throw new InternalServerError('Error has occured');
+    .catch((err) => {
+      throw err;
     })
     .catch(next);
 };
@@ -27,9 +26,8 @@ module.exports.createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Inccorrect data passed during user creation');
-      } else {
-        throw new InternalServerError('Error has occured');
       }
+      throw err;
     })
     .catch(next);
 };
