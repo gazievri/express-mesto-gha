@@ -60,11 +60,11 @@ module.exports.createUser = (req, res, next) => {
         name, about, avatar, email, password: hash,
       },
     ))
-    .then(() => {
-      // const userNew = user;
-      // userNew.password = null;
-      // console.log(userNew)
-      res.status(STATUS_CREATED).send({ message: 'User successful created' });
+    .then((user) => {
+      const userNew = user;
+      userNew.password = '';
+      console.log(userNew)
+      res.status(STATUS_CREATED).send({ data: userNew });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
