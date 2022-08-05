@@ -16,7 +16,7 @@ module.exports.getUserInfo = (req, res, next) => {
   const { _id } = req.user;
 
   User.find({ _id })
-    .then((user) => res.status(STATUS_OK).send(user))
+    .then((user) => res.status(STATUS_OK).send({ data: user }))
     .catch((err) => {
       throw err;
     })
@@ -63,7 +63,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const userWithOutPassword = user.toObject();
       delete userWithOutPassword.password;
-      res.status(STATUS_CREATED).send(userWithOutPassword);
+      res.status(STATUS_CREATED).send({ data: userWithOutPassword });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
