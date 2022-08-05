@@ -39,9 +39,9 @@ module.exports.deleteCardById = (req, res, next) => {
 
   Card.findById(cardId)
     .then((card) => {
+      if (!card) { throw new NotFoundError('Card not found'); }
       // eslint-disable-next-line eqeqeq
       if (card.owner != req.user._id) { throw new ForbiddenError('You can not delete not yours cards'); }
-      if (!card) { throw new NotFoundError('Card not found'); }
       card.remove()
         .then(() => res.status(STATUS_OK).send({ message: `Card ${cardId} has been removed` }))
         .catch((err) => { throw err; });
