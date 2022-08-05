@@ -20,11 +20,11 @@ const validateId = (value, helpers) => {
 
 routerUsers.get('/users', auth, getAllUsers);
 
-// routerUsers.get('/users/:userId', celebrate({
-//   params: Joi.object().keys({
-//     name: Joi.string().custom(validateId, 'ObjectId validation'),
-//   }),
-// }), auth, getUserById);
+routerUsers.get('/users/:userId', celebrate({
+  params: Joi.object().keys({
+    name: Joi.string().custom(validateId, 'ObjectId validation'),
+  }),
+}), auth, getUserById);
 
 routerUsers.patch('/users/me', celebrate({
   body: Joi.object().keys({
@@ -35,7 +35,7 @@ routerUsers.patch('/users/me', celebrate({
 
 routerUsers.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    link: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    avatar: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), auth, updateAvatar);
 
@@ -52,6 +52,7 @@ routerUsers.post('/signup', celebrate({
     password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
+    avatar: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), createUser);
 
