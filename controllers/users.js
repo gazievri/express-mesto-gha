@@ -16,7 +16,7 @@ module.exports.getUserInfo = (req, res, next) => {
   const { _id } = req.user;
 
   User.find({ _id })
-    .then((user) => res.status(STATUS_OK).send({ data: user }))
+    .then((user) => res.status(STATUS_OK).send(user))
     .catch((err) => {
       throw err;
     })
