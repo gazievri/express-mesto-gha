@@ -42,10 +42,7 @@ module.exports.deleteCardById = (req, res, next) => {
       if (card.owner != req.user._id) { throw new ForbiddenError('You can not delete not yours cards'); }
       card.remove()
         .then(() => res.status(STATUS_OK).send({ message: `Card ${cardId} has been removed` }))
-        .catch((err) => { throw err; });
-    })
-    .catch((err) => {
-      throw err;
+        .catch(next);
     })
     .catch(next);
 };
