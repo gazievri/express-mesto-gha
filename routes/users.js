@@ -20,11 +20,11 @@ const validateId = (value, helpers) => {
 
 routerUsers.get('/users', auth, getAllUsers);
 
-routerUsers.get('/users/:userId', celebrate({
-  params: Joi.object().keys({
-    name: Joi.string().custom(validateId, 'ObjectId validation'),
-  }),
-}), auth, getUserById);
+// routerUsers.get('/users/:userId', celebrate({
+//   params: Joi.object().keys({
+//     name: Joi.string().custom(validateId, 'ObjectId validation'),
+//   }),
+// }), auth, getUserById);
 
 routerUsers.patch('/users/me', celebrate({
   body: Joi.object().keys({
