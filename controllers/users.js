@@ -12,6 +12,17 @@ const {
   STATUS_OK,
 } = require('../utils/constants');
 
+module.exports.getUserInfo = (req, res, next) => {
+  const { _id } = req.user;
+
+  User.find({ _id })
+    .then((user) => res.status(STATUS_OK).send({ user }))
+    .catch((err) => {
+      throw err;
+    })
+    .catch(next);
+};
+
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
@@ -130,17 +141,6 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.status(STATUS_OK).cookie('authorization', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({ message: 'Athorization successful' });
     })
-    .catch((err) => {
-      throw err;
-    })
-    .catch(next);
-};
-
-module.exports.getUserInfo = (req, res, next) => {
-  const { _id } = req.user;
-
-  User.find({ _id })
-    .then((user) => res.status(STATUS_OK).send({ user }))
     .catch((err) => {
       throw err;
     })

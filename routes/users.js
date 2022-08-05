@@ -20,9 +20,11 @@ const validateId = (value, helpers) => {
 
 routerUsers.get('/users', auth, getAllUsers);
 
+routerUsers.get('/users/me', auth, getUserInfo);
+
 routerUsers.get('/users/:userId', celebrate({
   params: Joi.object().keys({
-    name: Joi.string().custom(validateId, 'ObjectId validation'),
+    userId: Joi.string().custom(validateId, 'ObjectId validation'),
   }),
 }), auth, getUserById);
 
@@ -55,7 +57,5 @@ routerUsers.post('/signup', celebrate({
     avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), createUser);
-
-routerUsers.get('/users/me', auth, getUserInfo);
 
 module.exports = routerUsers;
