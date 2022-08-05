@@ -61,17 +61,14 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
     if (!card) {
       throw new NotFoundError('Request card not found');
     }
-    res.status(STATUS_OK).send({ data: card });
+    res.status(STATUS_CREATED).send({ data: card });
   })
-  // .catch((err) => {
-  //   console.log(err)
-  //   if (err.name === 'CastError') {
-  //     throw new BadRequestError('Card ID is incorrect');
-  //   } else {
-  //     throw new InternalServerError('Error has occured');
-  //   }
-  //   throw err;
-  // })
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      throw new BadRequestError('Card ID is incorrect');
+    }
+    throw err;
+  })
   .catch(next);
 
 module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
@@ -88,8 +85,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   .catch((err) => {
     if (err.name === 'CastError') {
       throw new BadRequestError('Card ID is incorrect');
-    } else {
-      throw new InternalServerError('Error has occured');
     }
+    throw err;
   })
   .catch(next);

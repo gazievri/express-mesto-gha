@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const InternalServerError = require('../errors/internal-server-errors');
 const BadRequestError = require('../errors/bad-request-errors');
 const EmailExistError = require('../errors/email-exist-errors');
 const NotFoundError = require('../errors/not-found-errors');
@@ -33,9 +32,8 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Id is incorrect');
-      } else {
-        throw new InternalServerError('Error has occured');
       }
+      throw err;
     })
     .catch(next);
 };
@@ -86,11 +84,11 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Invalid data passed when updating profile');
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError('User ID is incorrect');
-      } else {
-        throw new InternalServerError('Error has occured');
       }
+      if (err.name === 'CastError') {
+        throw new BadRequestError('User ID is incorrect');
+      }
+      throw err;
     })
     .catch(next);
 };
@@ -115,11 +113,11 @@ module.exports.updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Invalid data passed when updating profile');
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError('User ID is incorrect');
-      } else {
-        throw new InternalServerError('Error has occured');
       }
+      if (err.name === 'CastError') {
+        throw new BadRequestError('User ID is incorrect');
+      }
+      throw err;
     })
     .catch(next);
 };
