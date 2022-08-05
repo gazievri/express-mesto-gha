@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     minlength: [4, 'Password must be at least 6 characters'],
     select: false,
   },
-});
+}, { versionKey: false });
 
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
