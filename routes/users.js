@@ -1,7 +1,7 @@
 const routerUsers = require('express').Router();
-const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middlewares/auth');
+const { validateId } = require('../utils/validateId');
 
 const {
   getAllUsers,
@@ -12,11 +12,6 @@ const {
   login,
   getUserInfo,
 } = require('../controllers/users');
-
-const validateId = (value, helpers) => {
-  if (mongoose.isValidObjectId(value)) { return value; }
-  return helpers.error('any.invalid');
-};
 
 routerUsers.get('/users', auth, getAllUsers);
 

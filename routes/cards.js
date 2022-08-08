@@ -1,16 +1,11 @@
 const routerCards = require('express').Router();
-const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middlewares/auth');
+const { validateId } = require('../utils/validateId');
 
 const {
   getAllCards, createCard, deleteCardById, likeCard, dislikeCard,
 } = require('../controllers/cards');
-
-const validateId = (value, helpers) => {
-  if (mongoose.isValidObjectId(value)) { return value; }
-  return helpers.error('any.invalid');
-};
 
 routerCards.get('/cards', auth, getAllCards);
 

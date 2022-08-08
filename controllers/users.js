@@ -42,11 +42,11 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Id is incorrect');
+        next(new BadRequestError('Id is incorrect'));
+        return;
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -67,14 +67,15 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(err.message);
+        next(new BadRequestError(err.message));
+        return;
       }
       if (err.code === 11000) {
-        throw new EmailExistError(`User with email ${email} already exist`);
+        next(new EmailExistError(`User with email ${email} already exist`));
+        return;
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -96,14 +97,15 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Invalid data passed when updating profile');
+        next(new BadRequestError('Invalid data passed when updating profile'));
+        return;
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError('User ID is incorrect');
+        next(new BadRequestError('User ID is incorrect'));
+        return;
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -125,14 +127,15 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Invalid data passed when updating profile');
+        next(new BadRequestError('Invalid data passed when updating profile'));
+        return;
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError('User ID is incorrect');
+        next(new BadRequestError('User ID is incorrect'));
+        return;
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -142,9 +145,6 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.status(STATUS_OK).cookie('authorization', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({ message: 'Athorization successful' });
-    })
-    .catch((err) => {
-      throw err;
     })
     .catch(next);
 };

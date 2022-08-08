@@ -25,11 +25,11 @@ module.exports.createCard = (req, res, next) => {
     .then((cards) => res.status(STATUS_CREATED).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Inccorrect data passed during user creation');
+        next(new BadRequestError('Inccorrect data passed during user creation'));
+        return;
       }
-      throw err;
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.deleteCardById = (req, res, next) => {
@@ -60,11 +60,11 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      throw new BadRequestError('Card ID is incorrect');
+      next(new BadRequestError('Card ID is incorrect'));
+      return;
     }
-    throw err;
-  })
-  .catch(next);
+    next(err);
+  });
 
 module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
@@ -79,8 +79,8 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      throw new BadRequestError('Card ID is incorrect');
+      next(new BadRequestError('Card ID is incorrect'));
+      return;
     }
-    throw err;
-  })
-  .catch(next);
+    next(err);
+  });
