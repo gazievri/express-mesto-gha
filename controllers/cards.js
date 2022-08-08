@@ -41,9 +41,6 @@ module.exports.deleteCardById = (req, res, next) => {
       // eslint-disable-next-line eqeqeq
       if (card.owner != req.user._id) { throw new ForbiddenError('You can not delete not yours cards'); }
       return card.remove();
-      // card.remove()
-      //   .then(() => res.status(STATUS_OK).send({ message: `Card ${cardId} has been removed` }))
-      //   .catch(next);
     })
     .then(() => {
       res.status(STATUS_OK).send({ message: `Card ${cardId} has been removed` });
