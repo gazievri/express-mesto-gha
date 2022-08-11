@@ -17,9 +17,6 @@ module.exports.getUserInfo = (req, res, next) => {
 
   User.find({ _id })
     .then((user) => res.status(STATUS_OK).send({ data: user[0] }))
-    .catch((err) => {
-      throw err;
-    })
     .catch(next);
 };
 
