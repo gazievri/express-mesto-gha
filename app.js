@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:127.0.0.1/mestodb', {
+mongoose.connect('mongodb://127.0.0.1/mestodb', {
   useNewUrlParser: true,
 });
 
