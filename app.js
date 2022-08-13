@@ -7,13 +7,10 @@ const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const NotFoundError = require('./errors/not-found-errors');
 const { handleError } = require('./utils/handleError');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
-
-app.use(requestLogger); // подключаем логгер запросов
 
 app.use(cookieParser());
 
@@ -30,8 +27,6 @@ app.use(routerCards);
 app.all('/*', () => {
   throw new NotFoundError('Requested path not found');
 });
-
-app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors());
 
